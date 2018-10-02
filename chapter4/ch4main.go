@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/gopl-solutions/chapter4/ex4.13"
+
 	"github.com/gopl-solutions/chapter4/ex4.12"
 )
 
-func main() {
+func xkcdDriver() {
 	wordFile := "word.json"
 	comicFile := "comic.json"
 
@@ -45,4 +47,35 @@ func main() {
 		}
 	}
 
+}
+
+func omdbDriver() {
+	apikey := os.Args[1]
+	title := os.Args[2]
+	movie, err := omdb.GetMovie(apikey, title)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error fetching info for: %s.. %v\n", title, err)
+		return
+	}
+
+	fmt.Printf("Movie: %v\n", *movie)
+
+	if len(movie.Error) > 0 {
+		fmt.Fprintf(os.Stderr, "error getting movie: %s\n", movie.Error)
+		return
+	}
+
+	filename, err := omdb.DownloadPoster(movie)
+
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error downloading poster for: %s.. %v\n", title, err)
+	}
+
+	fmt.Printf("Poster downloaded at: %s\n", filename)
+}
+
+func main() {
+	if len(os.Args) == 3 {
+		omdbDriver()
+	}
 }
